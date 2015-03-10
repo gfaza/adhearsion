@@ -14,21 +14,22 @@ module Adhearsion
     CommandTimeout  = Class.new Adhearsion::Error
     ExpiredError    = Class.new Celluloid::DeadActorError
 
+    # @private
+    class ActorProxy < Celluloid::ActorProxy
+      def method_missing(meth, *args, &block)
+        super(meth, *args, &block)
+      rescue ::Celluloid::DeadActorError
+        raise ExpiredError, "This call is expired and is no longer accessible"
+      end
+    end
+
     include Celluloid
     include HasGuardedHandlers
 
+    proxy_class Call::ActorProxy
+
     execute_block_on_receiver :register_handler, :register_tmp_handler, :register_handler_with_priority, :register_event_handler, :on_joined, :on_unjoined, :on_end, :execute_controller
     finalizer :finalize
-
-    def self.new(*args, &block)
-      super.tap do |proxy|
-        def proxy.method_missing(*args)
-          super
-        rescue Celluloid::DeadActorError
-          raise ExpiredError, "This call is expired and is no longer accessible"
-        end
-      end
-    end
 
     # @return [Symbol] the reason for the call ending
     attr_reader :end_reason
@@ -446,9 +447,19 @@ module Adhearsion
       end
     end
 
-    def finalize
-      ::Logging::Repository.instance.delete logger_id
+    def logger
+      if id
+        @logger ||= ::Logging.logger[ logger_id ]
+      else
+        ::Logging.logger[ self.class.name ]
+      end
     end
+    public :logger
+
+    # NOTE: memoize once used so it's correctly disposed (won't leak)
+    def logger_id; @logger_id ||= "#{self.class}: #{id}@#{domain}" end
+
+    def finalize; ::Logging::Logger.dispose!(logger_id) end
 
     # @private
     class CommandRegistry < Array
