@@ -280,6 +280,11 @@ module Adhearsion
             Adhearsion::Logging.get_logger(Initializer).should_receive(:error).once.with("Event received for inactive call #{call_id}: #{mock_event.inspect}")
             Initializer.dispatch_call_event mock_event
           end
+
+          it "should trigger an inactive call event" do
+            Events.instance.should_receive(:trigger).once.with(:inactive_call, mock_event)
+            Initializer.dispatch_call_event mock_event
+          end
         end
       end
 
