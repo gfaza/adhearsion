@@ -208,7 +208,7 @@ module Adhearsion
           f = File.expand_path(Adhearsion.config.root.dup.concat("/").concat(a)) unless a.start_with?("/")
           ::Logging.appenders.file(f,
             :layout => ::Logging.layouts.pattern(
-              :pattern => Adhearsion::Logging.adhearsion_pattern
+              Adhearsion::Logging.adhearsion_pattern_options
             ),
            :auto_flushing => 2,
            :flush_period => 2
