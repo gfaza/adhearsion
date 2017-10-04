@@ -2,7 +2,6 @@
 *.gem
 /pkg
 /.bundle
-/Gemfile.lock
 /vendor
 
 # Testing stuff
