@@ -511,6 +511,7 @@ module Adhearsion
 
         # The duration for which the calls were joined. Does not include time spent in confirmation controllers or after being separated.
         def duration
+          puts "self.class #{self.class}, start_time: #{start_time}, end_time: #{end_time}"
           if start_time && end_time
             end_time - start_time
           else

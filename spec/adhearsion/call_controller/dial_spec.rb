@@ -287,7 +287,7 @@ module Adhearsion
               expect(joined_status.result).to eq(:joined)
             end
 
-            it "records the duration of the join" do
+            it "records the duration of the join", focus: true do
               expect(call).to receive(:answer).once
               expect(other_mock_call).to receive(:join).once.with(call, {}) do
                 call << Punchblock::Event::Joined.new(call_uri: other_mock_call.id)
@@ -315,6 +315,7 @@ module Adhearsion
               status = t.value
               expect(status.result).to eq(:answer)
               joined_status = status.joins[status.calls.first]
+              # puts "start_time: #{start_time}\nend_time: #{end_time}\nduration: #{joined_status.duration}"
               expect(joined_status.duration).to eq(37.0)
             end
 
@@ -409,7 +410,7 @@ module Adhearsion
               expect(dial.status.result).to eq(:answer)
             end
 
-            it "should set end time" do
+            it "should set end time", focus: true do
               dial = Dial::Dial.new to, options, call
               dial.run subject
 
@@ -1331,7 +1332,7 @@ module Adhearsion
               expect(latch.wait(2)).to be_truthy
             end
 
-            it "should join the calls if the call is still active after execution of the call controller" do
+            it "should join the calls if the call is still active after execution of the call controller", focus: true do
               other_mock_call['confirm'] = true
               expect(call).to receive(:answer).once
               expect(other_mock_call).to receive(:join).once.with(call, {}) do
@@ -1706,7 +1707,7 @@ module Adhearsion
               expect(joined_status.result).to eq(:joined)
             end
 
-            it "records the duration of the join" do
+            it "records the duration of the join", focus: true do
               expect(call).to receive(:answer).once
               expect(other_mock_call).to receive(:join).once.with(call, {}) do
                 call << Punchblock::Event::Joined.new(call_uri: other_mock_call.id)
@@ -1831,7 +1832,7 @@ module Adhearsion
               expect(dial.status.result).to eq(:answer)
             end
 
-            it "should set end time" do
+            it "should set end time", focus: true do
               dial = Dial::ParallelConfirmationDial.new to, options, call
               dial.run subject
 
@@ -2687,7 +2688,7 @@ module Adhearsion
               expect(latch.wait(2)).to be_truthy
             end
 
-            it "should join the calls if the call is still active after execution of the call controller" do
+            it "should join the calls if the call is still active after execution of the call controller", focus: true do
               expect(other_mock_call).to receive(:hangup).once do
                 other_mock_call << mock_end
               end

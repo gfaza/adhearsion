@@ -240,6 +240,12 @@ module Adhearsion
         logger.info "Call #{from} -> #{to} ended due to #{event.reason}#{" (code #{event.platform_code})" if event.platform_code}"
         @end_time = event.timestamp.to_time
         @duration = @end_time - @start_time if @start_time
+        puts "RUBY_VERSION: #{RUBY_VERSION}, RUBY_VERSION < '1.9': #{RUBY_VERSION < '1.9'}"
+        puts "event.timestamp.offset: #{event.timestamp.offset}"
+        puts "event.timestamp.class: #{event.timestamp.class}"
+        puts "event.timestamp.to_time.class: #{event.timestamp.to_time.class}"
+        puts "self.class #{self.class}, @duration: #{@duration.class}, @start_time: #{@start_time.class}, @end_time: #{@end_time.class}"
+        puts "self.class #{self.class}, @duration: #{@duration}, @start_time: #{@start_time}, @end_time: #{@end_time}"
         clear_from_active_calls
         @end_reason = event.reason
         @end_code = event.platform_code
@@ -251,6 +257,7 @@ module Adhearsion
 
     # @return [Float] The call duration until the current time, or until the call was disconnected, whichever is earlier
     def duration
+      puts "self.class #{self.class}, @duration: #{@duration}, @start_time: #{@start_time}, Time.now: #{Time.now}"
       if @duration
         @duration
       elsif @start_time

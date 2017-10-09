@@ -580,7 +580,7 @@ module Adhearsion
           expect(subject.end_time).to eq(finish_time)
         end
 
-        it "should set the call duration" do
+        it "should set the call duration", focus: true do
           start_time = Time.local(2008, 9, 1, 12, 0, 0)
           Timecop.freeze start_time
           subject
