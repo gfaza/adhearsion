@@ -76,6 +76,7 @@ module Adhearsion
       # @see #dial
       def dial_and_confirm(to, options = {})
         dial = ParallelConfirmationDial.new to, options, call
+        yield dial if block_given?
         dial.run(self)
         dial.await_completion
         dial.terminate_ringback
@@ -235,16 +236,21 @@ module Adhearsion
             end
           end.compact
           logger.info "Splitting off peer calls #{calls_to_split.map(&:first).join ", "}"
+          controller_metadata = {'current_dial' => self}
+          others_metadata = controller_metadata.clone
+          others_metadata.merge!(targets[:others_metadata]) if targets.key? :others_metadata
           calls_to_split.each do |id, call|
             ignoring_ended_calls do
               logger.debug "Unjoining peer #{call.id} from #{join_target}"
               ignoring_missing_joins { call.unjoin join_target }
               if split_controller = targets[:others]
                 logger.info "Executing controller #{split_controller} on split call #{call.id}"
-                call.execute_controller split_controller.new(call, 'current_dial' => self), targets[:others_callback]
+                call.execute_controller split_controller.new(call, others_metadata), targets[:others_callback]
               end
             end
           end
+          main_metadata = controller_metadata.clone
+          main_metadata.merge!(targets[:main_metadata]) if targets.key? :main_metadata
           ignoring_ended_calls do
             if join_target != @call
               logger.debug "Unjoining main call #{@call.id} from #{join_target}"
@@ -252,7 +258,7 @@ module Adhearsion
             end
             if split_controller = targets[:main]
               logger.info "Executing controller #{split_controller} on main call"
-              @call.execute_controller split_controller.new(@call, 'current_dial' => self), targets[:main_callback]
+              @call.execute_controller split_controller.new(@call, main_metadata), targets[:main_callback]
             end
           end
         end
