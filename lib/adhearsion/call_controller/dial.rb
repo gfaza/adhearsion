@@ -182,7 +182,7 @@ module Adhearsion
                     new_call.join @join_target, @join_options
                   rescue Adhearsion::Call::Hangup
                     logger.info "#{new_call.id} has already hungup"
-                    break
+                    next
                   end
                   unless @join_target == @call
                     @call.join @join_target, @join_options
