@@ -178,7 +178,12 @@ module Adhearsion
                 if @call.alive? && @call.active?
                   logger.info "#dial joining call #{new_call.id} to #{@call.id}"
                   @call.answer
-                  new_call.join @join_target, @join_options
+                  begin
+                    new_call.join @join_target, @join_options
+                  rescue Adhearsion::Call::Hangup
+                    logger.info "#{new_call.id} has already hungup"
+                    break
+                  end
                   unless @join_target == @call
                     @call.join @join_target, @join_options
                   end
