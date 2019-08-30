@@ -180,8 +180,8 @@ module Adhearsion
                   @call.answer
                   begin
                     new_call.join @join_target, @join_options
-                  rescue Adhearsion::Call::Hangup
-                    logger.info "#{new_call.id} has already hungup"
+                  rescue Adhearsion::Call::Hangup => e
+                    logger.info "#{new_call.id} has already hungup - #{e.message}"
                     next
                   end
                   unless @join_target == @call
